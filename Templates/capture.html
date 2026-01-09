@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% set active_page = 'capture' %}
+{% block title %}Capture Faces • AI Attendance{% endblock %}
+
+{% block content %}
+<section class="grid gap-6 md:grid-cols-3">
+    <div class="md:col-span-2 rounded-2xl border border-slate-800 bg-slate-900/80 p-5">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h1 class="text-lg font-semibold">Capture student face</h1>
+                <p class="text-xs text-slate-400 mt-1">Allow camera access and center the student’s face inside the frame before capturing.</p>
+            </div>
+        </div>
+
+        <div class="aspect-video rounded-xl border border-slate-800 overflow-hidden bg-black">
+            <video id="video" autoplay playsinline class="w-full h-full object-cover"></video>
+            <canvas id="canvas" class="hidden"></canvas>
+        </div>
+
+        <form id="captureForm" class="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap gap-3 items-center">
+            <input id="studentName" name="student_name"
+                   class="text-sm px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 focus:border-indigo-500 outline-none"
+                   placeholder="Student full name" required>
+            <input id="studentId" name="student_id"
+                   class="text-sm px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 focus:border-indigo-500 outline-none"
+                   placeholder="Roll / ID (optional)">
+          </div>
+
+          <div class="flex items-center gap-2">
+            <select id="subjectSelectCapture" name="subject" class="bg-slate-950 border border-slate-800 rounded-xl p-2 text-sm">
+              {% for s in subjects %}
+                <option value="{{ s }}">{{ s }}</option>
+              {% endfor %}
+            </select>
+
+            <select id="teacherSelectCapture" name="teacher" class="bg-slate-950 border border-slate-800 rounded-xl p-2 text-sm">
+              <option value="">Teacher (optional)</option>
+              {% for t in teachers %}
+                <option value="{{ t }}">{{ t }}</option>
+              {% endfor %}
+            </select>
+
+            <button id="captureBtn" type="button" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-sm font-medium">
+                Capture &amp; Save Student
+            </button>
+
+            <button id="captureClassBtn" type="button" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-sm font-medium">
+                Capture Class Photo
+            </button>
+
+            <label class="inline-flex items-center text-sm ml-2">
+              <input id="autoRecognize" type="checkbox" class="mr-2">
+              <span class="text-xs text-slate-300">Auto-run recognition</span>
+            </label>
+          </div>
+        </form>
+
+        <p class="mt-2 text-[11px] text-slate-500">Captured images are stored in the dataset folder for the selected student and used when generating encodings.</p>
+    </div>
+
+    <div class="space-y-4">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5">
+            <h2 class="text-sm font-semibold mb-3 text-slate-200">Tips for better recognition</h2>
+            <ul class="list-disc list-inside text-xs text-slate-300 space-y-1.5">
+                <li>Capture 3–5 images per student with slightly different angles.</li>
+                <li>Ensure good lighting and that the face is not cropped.</li>
+                <li>Avoid heavy motion blur and very low resolution frames.</li>
+                <li>Regenerate encodings from the dashboard after adding new students.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='webcam_capture.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,29 @@
+@app.route("/attendance")
+@login_required
+@role_required('admin', 'teacher', 'student')
+def attendance():
+    # If student, only show their own attendance
+    if session.get('user_role') == 'student':
+        student_name = session.get('full_name')
+        # Filter rows to only show attendance for this student
+        raw_rows = _read_attendance_rows()
+        rows = []
+        for name, ts, conf, sess, img, subj, teacher in raw_rows:
+            if name.lower() == student_name.lower():
+                try:
+                    conf_f = float(conf)
+                except:
+                    conf_f = 0.0
+                rows.append([name, ts, conf_f, sess, img, subj, teacher])
+    else:
+        # Admin/teacher see all
+        raw_rows = _read_attendance_rows()
+        rows = []
+        for name, ts, conf, sess, img, subj, teacher in raw_rows:
+            try:
+                conf_f = float(conf)
+            except:
+                conf_f = 0.0
+            rows.append([name, ts, conf_f, sess, img, subj, teacher])
+    
+    # Rest of the function remains the same...

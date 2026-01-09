@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% set active_page = 'dashboard' %}
+{% block title %}Dashboard • AI Attendance{% endblock %}
+
+{% block content %}
+<section class="grid gap-6 md:grid-cols-3">
+    <div class="md:col-span-2 space-y-4">
+        <div class="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 to-slate-950 p-6 flex flex-col gap-4">
+            <div class="flex items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl font-semibold tracking-tight">Welcome back</h1>
+                    <p class="text-sm text-slate-400 mt-1">Use your webcam to recognize students and mark attendance in real time.</p>
+                </div>
+                <div class="hidden sm:flex gap-3">
+                    <a href="{{ url_for('capture_page') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm">Capture faces</a>
+                    <a href="{{ url_for('attendance') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-sm font-medium">Start attendance</a>
+                </div>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-3 mt-4">
+                <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+                    <p class="text-xs text-slate-400">Total students</p>
+                    <p class="mt-2 text-2xl font-semibold">{{ student_count }}</p>
+                </div>
+                <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+                    <p class="text-xs text-slate-400">Total attendance rows</p>
+                    <p class="mt-2 text-2xl font-semibold">{{ attendance_count }}</p>
+                </div>
+                <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+                    <p class="text-xs text-slate-400">Class photos</p>
+                    <p class="mt-2 text-2xl font-semibold">{{ uploads_count }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+            <h2 class="text-sm font-semibold mb-3 text-slate-200">Quick actions</h2>
+            <div class="grid gap-3 sm:grid-cols-3 text-sm">
+                <a href="{{ url_for('capture_page') }}" class="rounded-xl border border-slate-800 bg-slate-900 hover:border-indigo-500 px-4 py-3 flex flex-col gap-1">
+                    <span class="font-medium">Register new student</span>
+                    <span class="text-xs text-slate-400">Capture face and save encoding</span>
+                </a>
+                <a href="{{ url_for('attendance') }}" class="rounded-xl border border-slate-800 bg-slate-900 hover:border-indigo-500 px-4 py-3 flex flex-col gap-1">
+                    <span class="font-medium">Take attendance</span>
+                    <span class="text-xs text-slate-400">Start webcam & recognize faces</span>
+                </a>
+                <a href="{{ url_for('students') }}" class="rounded-xl border border-slate-800 bg-slate-900 hover:border-indigo-500 px-4 py-3 flex flex-col gap-1">
+                    <span class="font-medium">Manage students</span>
+                    <span class="text-xs text-slate-400">View, edit or delete records</span>
+                </a>
+            </div>
+
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 mt-4">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <h3 class="text-sm font-semibold">Quick class photo</h3>
+                  <p class="text-xs text-slate-400">Capture a class photo here and automatically mark attendance.</p>
+                </div>
+                <div>
+                  <label class="inline-flex items-center text-xs text-slate-300">
+                    <input id="autoRecMain" type="checkbox" class="mr-2" checked>
+                    Auto recognize
+                  </label>
+                </div>
+              </div>
+
+              <div class="grid md:grid-cols-2 gap-3 items-center">
+                <div class="aspect-video rounded-md overflow-hidden bg-black border border-slate-800">
+                  <video id="dashboardVideo" autoplay playsinline class="w-full h-full object-cover"></video>
+                  <canvas id="dashboardCanvas" class="hidden"></canvas>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                  <div class="flex gap-2 items-center">
+                    <select id="subjectSelect" class="bg-slate-950 border border-slate-800 rounded-xl p-2 text-sm">
+                      {% for s in subjects %}
+                        <option value="{{ s }}">{{ s }}</option>
+                      {% endfor %}
+                    </select>
+                    <select id="teacherSelect" class="bg-slate-950 border border-slate-800 rounded-xl p-2 text-sm">
+                      <option value="">Teacher (optional)</option>
+                      {% for t in teachers %}
+                        <option value="{{ t }}">{{ t }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+
+                  <p class="text-xs text-slate-400">Use this to quickly capture the whole class from the dashboard. Allow camera access when asked.</p>
+                  <div class="flex gap-2">
+                    <button id="startDashboardCam" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm">Start Camera</button>
+                    <button id="captureClassMain" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-sm font-medium">Capture Class Photo</button>
+                  </div>
+                  <div id="classCaptureStatus" class="text-xs text-slate-400"></div>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <!-- Timeline widget -->
+        <div id="timelineWidget" class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+          <h3 class="text-sm font-semibold mb-2 text-slate-200">Timeline</h3>
+          <div id="timelineList" class="space-y-2 text-xs text-slate-300">Loading…</div>
+        </div>
+    </div>
+
+    <div class="space-y-4">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+            <h2 class="text-sm font-semibold mb-3 text-slate-200">Latest class photo</h2>
+            {% if latest %}
+                <div class="aspect-video rounded-xl border border-slate-800 overflow-hidden bg-black mb-3">
+                    <img src="{{ url_for('download_image', name=latest) }}" alt="Latest photo" class="w-full h-full object-cover">
+                </div>
+            {% else %}
+                <p class="text-xs text-slate-500">No class photo uploaded yet. Capture one from the dashboard or Capture Faces page.</p>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('encode') }}" class="mt-3 flex flex-col gap-2">
+                <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-sm font-medium">
+                    Run face encoding
+                </button>
+                <p class="text-[11px] text-slate-400">Encodings {{ 'available' if enc_exists else 'not generated yet' }}.</p>
+            </form>
+        </div>
+
+        <!-- Top streaks widget -->
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+          <h3 class="text-sm font-semibold mb-2 text-slate-200">Top streaks</h3>
+          <ul class="text-sm text-slate-300">
+            {% if top_streaks %}
+              {% for t in top_streaks %}
+                <li class="mb-1">{{ loop.index }}. {{ t.name }} — {{ t.streak }} day{{ 's' if t.streak != 1 else '' }}</li>
+              {% endfor %}
+            {% else %}
+              <li class="text-xs text-slate-400">No streaks yet.</li>
+            {% endif %}
+          </ul>
+        </div>
+    </div>
+</section>
+
+<script>
+async function fetchTimeline(){
+  try{
+    const r = await fetch('/timeline');
+    const j = await r.json();
+    const el = document.getElementById('timelineList');
+    el.innerHTML = '';
+    if(!j.success || !j.timeline || j.timeline.length===0){
+      el.innerHTML = '<div class="text-xs text-slate-400">No logs yet.</div>';
+      return;
+    }
+    j.timeline.slice(0,8).forEach(item=>{
+      const div = document.createElement('div');
+      div.className = 'flex gap-3 items-center';
+      const imgHtml = item.photo ? `<img src="{{ url_for('download_image', name='') }}${item.photo}" class="w-14 h-9 object-cover rounded">` : '<div class="w-14 h-9 bg-slate-800 rounded"></div>';
+      // If the above url_for trick doesn't resolve correctly for all setups, JS will still show a blank image; server-side paths are under uploads/
+      div.innerHTML = `<div style="min-width:72px">${imgHtml}</div>
+        <div class="flex-1">
+          <div class="font-medium text-[13px]">${item.subject}${item.teacher?(' • '+item.teacher):''}</div>
+          <div class="text-[11px] text-slate-400">${item.ts} — ${item.marked} marked / ${item.faces_found} faces</div>
+        </div>`;
+      el.appendChild(div);
+    });
+  }catch(e){
+    // silent
+  }
+}
+fetchTimeline();
+setInterval(fetchTimeline, 10000);
+</script>
+
+<script src="{{ url_for('static', filename='classphoto.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% set active_page = 'users' %}
+{% block title %}User Management • AI Attendance{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold">User Management</h1>
+        <p class="text-slate-400 mt-1">Manage system users and permissions</p>
+    </div>
+</div>
+
+<div class="grid gap-6 md:grid-cols-3">
+    <div class="md:col-span-2">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+            <h2 class="text-lg font-semibold mb-4">All Users</h2>
+            
+            {% if users %}
+            <div class="overflow-auto rounded-lg border border-slate-800">
+                <table class="w-full text-sm">
+                    <thead class="bg-slate-800 text-slate-300">
+                        <tr>
+                            <th class="p-3 text-left">ID</th>
+                            <th class="p-3 text-left">Username</th>
+                            <th class="p-3 text-left">Full Name</th>
+                            <th class="p-3 text-left">Role</th>
+                            <th class="p-3 text-left">Department</th>
+                            <th class="p-3 text-left">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr class="border-t border-slate-800 hover:bg-slate-800/50">
+                            <td class="p-3">{{ user.id }}</td>
+                            <td class="p-3 font-medium">{{ user.username }}</td>
+                            <td class="p-3">{{ user.full_name or '—' }}</td>
+                            <td class="p-3">
+                                <span class="px-2 py-1 rounded text-xs 
+                                    {% if user.role == 'admin' %}bg-purple-900/50 text-purple-300
+                                    {% elif user.role == 'teacher' %}bg-blue-900/50 text-blue-300
+                                    {% else %}bg-green-900/50 text-green-300{% endif %}">
+                                    {{ user.role|title }}
+                                </span>
+                            </td>
+                            <td class="p-3">{{ user.department or '—' }}</td>
+                            <td class="p-3">
+                                {% if user.id != session.user_id %}
+                                <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST" 
+                                      onsubmit="return confirm('Delete user {{ user.username }}?');" class="inline">
+                                    <button type="submit" class="text-red-400 hover:text-red-300 text-xs">Delete</button>
+                                </form>
+                                {% else %}
+                                <span class="text-xs text-slate-500">Current user</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-8 text-slate-500">
+                No users found in the system.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div>
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+            <h2 class="text-lg font-semibold mb-4">Add New User</h2>
+            
+            <form method="POST" action="{{ url_for('add_user') }}" class="space-y-4">
+                <div>
+                    <label class="block text-sm text-slate-300 mb-2">Username *</label>
+                    <input type="text" name="username" required
+                           class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg focus:outline-none focus:border-indigo-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm text-slate-300 mb-2">Password *</label>
+                    <input type="password" name="password" required
+                           class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg focus:outline-none focus:border-indigo-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm text-slate-300 mb-2">Full Name</label>
+                    <input type="text" name="full_name"
+                           class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg focus:outline-none focus:border-indigo-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm text-slate-300 mb-2">Role *</label>
+                    <select name="role" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg focus:outline-none focus:border-indigo-500">
+                        <option value="">Select Role</option>
+                        <option value="admin">Administrator</option>
+                        <option value="teacher">Teacher</option>
+                        <option value="student">Student</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm text-slate-300 mb-2">Department</label>
+                    <input type="text" name="department"
+                           class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg focus:outline-none focus:border-indigo-500">
+                </div>
+                
+                <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg font-medium">
+                    Add User
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

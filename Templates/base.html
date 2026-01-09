@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>{% block title %}AI Attendance{% endblock %}</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+    <style>
+      .table-scroll { max-height: 360px; overflow: auto; }
+      .toast { position: fixed; right: 1rem; top: 1rem; z-index: 60; }
+      .fade-enter { opacity: 0; transform: translateY(-6px); }
+      .fade-enter-active { transition: all 280ms ease; opacity: 1; transform: translateY(0); }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+    {% if session.user_id %}
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-30">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="{{ url_for('index') }}" class="flex items-center gap-3">
+                <div class="h-9 w-9 rounded-xl bg-indigo-500 flex items-center justify-center text-lg font-bold">AI</div>
+                <div>
+                    <p class="font-semibold tracking-tight">AI Attendance System</p>
+                    <p class="text-xs text-slate-400">
+                        {{ session.full_name }} • {{ session.user_role|title }}
+                        {% if session.department %} • {{ session.department }}{% endif %}
+                    </p>
+                </div>
+            </a>
+
+            <nav class="hidden sm:flex gap-4 text-sm">
+                <a href="{{ url_for('index') }}" class="px-3 py-1.5 rounded-full hover:bg-slate-800 {% if active_page=='dashboard' %}bg-slate-800 text-indigo-300{% endif %}">Dashboard</a>
+                
+                {% if session.user_role in ['admin', 'teacher'] %}
+                <a href="{{ url_for('capture_page') }}" class="px-3 py-1.5 rounded-full hover:bg-slate-800 {% if active_page=='capture' %}bg-slate-800 text-indigo-300{% endif %}">Capture</a>
+                {% endif %}
+                
+                <a href="{{ url_for('attendance') }}" class="px-3 py-1.5 rounded-full hover:bg-slate-800 {% if active_page=='attendance' %}bg-slate-800 text-indigo-300{% endif %}">
+                    {% if session.user_role == 'student' %}My Attendance{% else %}Attendance{% endif %}
+                </a>
+                
+                {% if session.user_role == 'admin' %}
+                <a href="{{ url_for('students') }}" class="px-3 py-1.5 rounded-full hover:bg-slate-800 {% if active_page=='students' %}bg-slate-800 text-indigo-300{% endif %}">Students</a>
+                <a href="{{ url_for('subjects_page') }}" class="px-3 py-1.5 rounded-full hover:bg-slate-800 {% if active_page=='subjects' %}bg-slate-800 text-indigo-300{% endif %}">Subjects</a>
+                <a href="{{ url_for('teachers_page') }}" class="px-3 py-1.5 rounded-full hover:bg-slate-800 {% if active_page=='teachers' %}bg-slate-800 text-indigo-300{% endif %}">Teachers</a>
+                <a href="{{ url_for('users_page') }}" class="px-3 py-1.5 rounded-full hover:bg-slate-800 {% if active_page=='users' %}bg-slate-800 text-indigo-300{% endif %}">Users</a>
+                {% endif %}
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <span class="text-xs text-slate-400 hidden sm:block">{{ session.username }}</span>
+                <a href="{{ url_for('logout') }}" class="px-3 py-1 rounded-full bg-slate-800 hover:bg-red-600 text-xs">Logout</a>
+            </div>
+        </div>
+    </header>
+    {% endif %}
+
+    <main class="max-w-6xl mx-auto px-4 py-6">
+        {% with msgs = get_flashed_messages(with_categories=true) %}
+          {% if msgs %}
+            {% for cat,msg in msgs %}
+              <div class="mb-3 p-3 rounded-lg {{ 'bg-green-700' if cat=='success' else 'bg-red-700' }} text-white">
+                {{ msg }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    {% if session.user_id %}
+    <footer class="text-center text-muted small py-4 text-slate-500">
+      AI Attendance System • Logged in as {{ session.full_name }} ({{ session.user_role|title }})
+    </footer>
+    {% endif %}
+
+    <script>
+      // simple toast helper
+      function toast(msg, type='info', timeout=3000) {
+        const root = document.getElementById('toastRoot');
+        if (!root) return;
+        const el = document.createElement('div');
+        const bg = type==='success' ? 'bg-emerald-600' : (type==='error' ? 'bg-red-600' : 'bg-slate-800');
+        el.className = `mb-3 p-3 rounded-lg text-white ${bg}`;
+        el.innerText = msg;
+        root.appendChild(el);
+        setTimeout(()=> { el.style.opacity = '0'; setTimeout(()=>el.remove(),400); }, timeout);
+      }
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

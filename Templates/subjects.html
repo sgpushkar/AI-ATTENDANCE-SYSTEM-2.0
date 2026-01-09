@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% set active_page = 'subjects' %}
+{% block title %}Subjects • AI Attendance{% endblock %}
+
+{% block content %}
+<h2 class="mb-3 text-lg font-semibold">Manage Subjects</h2>
+
+<div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 mb-4">
+  <form method="post" class="flex gap-3">
+    <input name="subject_name" placeholder="Subject name (e.g. Maths)" class="bg-slate-950 border border-slate-800 p-2 rounded-xl"/>
+    <input type="hidden" name="action" value="add" />
+    <button class="px-3 py-2 rounded-xl bg-indigo-500">Add Subject</button>
+  </form>
+</div>
+
+<div class="grid gap-3 sm:grid-cols-3 md:grid-cols-4">
+  {% for s in subjects %}
+    <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-3 text-center flex flex-col gap-2">
+      <div class="text-sm font-semibold">{{ s }}</div>
+      <form action="{{ url_for('delete_subject', name=s) }}" method="post" onsubmit="return confirm('Delete subject {{ s }}?');">
+        <button class="text-xs text-red-400">Delete</button>
+      </form>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}
