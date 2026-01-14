@@ -1,0 +1,58 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# =========================
+# Virtual Environment
+# =========================
+venv/
+.env
+
+# =========================
+# OS / Editor junk
+# =========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# =========================
+# Project Generated Data
+# =========================
+dataset/
+encodings/
+uploads/
+backups/
+
+# =========================
+# Database & Backups
+# =========================
+attendance.db
+attendance.db.backup
+
+# =========================
+# CSV / Runtime Files
+# =========================
+attendance.csv
+timeline.json
+
+# =========================
+# Logs (if any)
+# =========================
+*.log
+
+# =========================
+# Node / Frontend (if used)
+# =========================
+node_modules/
+package-lock.json
+
+# =========================
+# Temporary / Test Files
+# =========================
+test_*.py

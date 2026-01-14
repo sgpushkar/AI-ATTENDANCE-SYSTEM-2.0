@@ -1,29 +1,155 @@
-@app.route("/attendance")
-@login_required
-@role_required('admin', 'teacher', 'student')
-def attendance():
-    # If student, only show their own attendance
-    if session.get('user_role') == 'student':
-        student_name = session.get('full_name')
-        # Filter rows to only show attendance for this student
-        raw_rows = _read_attendance_rows()
-        rows = []
-        for name, ts, conf, sess, img, subj, teacher in raw_rows:
-            if name.lower() == student_name.lower():
-                try:
-                    conf_f = float(conf)
-                except:
-                    conf_f = 0.0
-                rows.append([name, ts, conf_f, sess, img, subj, teacher])
-    else:
-        # Admin/teacher see all
-        raw_rows = _read_attendance_rows()
-        rows = []
-        for name, ts, conf, sess, img, subj, teacher in raw_rows:
-            try:
-                conf_f = float(conf)
-            except:
-                conf_f = 0.0
-            rows.append([name, ts, conf_f, sess, img, subj, teacher])
-    
-    # Rest of the function remains the same...
+{% extends "base.html" %}
+{% set active_page = 'attendance' %}
+{% block title %}Attendance • AI Attendance{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-4">
+  <div>
+    <h1 class="text-lg font-semibold">Attendance</h1>
+    <p class="text-xs text-slate-400">Subject & teacher filtered views and overall stats.</p>
+  </div>
+  <div class="flex items-center gap-3">
+    <form id="filterForm" method="GET" action="{{ url_for('attendance') }}">
+      <select name="subject" onchange="document.getElementById('filterForm').submit()" class="bg-slate-900 border border-slate-800 rounded-xl p-2 text-sm">
+        {% for s in subjects %}
+          <option value="{{ s }}" {% if s==selected_subject %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+      <select name="teacher" onchange="document.getElementById('filterForm').submit()" class="bg-slate-900 border border-slate-800 rounded-xl p-2 text-sm ml-2">
+        {% for t in teachers %}
+          <option value="{{ t }}" {% if t==selected_teacher %}selected{% endif %}>{{ t }}</option>
+        {% endfor %}
+      </select>
+    </form>
+    <a href="{{ url_for('download_weekly_sheet') }}?subject={{ selected_subject }}&teacher={{ selected_teacher }}" class="px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs">Download Weekly CSV</a>
+  </div>
+</div>
+
+<div class="grid gap-6 md:grid-cols-3">
+  <div class="md:col-span-2 space-y-4">
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold">Attendance Summary — {{ selected_subject }} {% if selected_teacher and selected_teacher!='All' %}• {{ selected_teacher }}{% endif %}</h2>
+          <p class="text-xs text-slate-400 mt-1">Weekly and monthly snapshots (subject or overall).</p>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <h3 class="text-sm font-medium mb-2">Weekly sheet (last 7 days)</h3>
+        {% if week_dates %}
+          <div class="overflow-auto rounded-md border border-slate-800">
+            <table class="w-full text-sm">
+              <thead class="text-slate-400 text-xs">
+                <tr>
+                  <th class="p-2 text-left">Student</th>
+                  {% for d, wd in week_dates %}
+                    <th class="p-2 text-center">{{ wd }}<br/><span class="text-[11px] text-slate-400">{{ d[5:] }}</span></th>
+                  {% endfor %}
+                  <th class="p-2 text-center">P</th>
+                  <th class="p-2 text-center">Out of</th>
+                  <th class="p-2 text-center">%</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for r in week_summary %}
+                  <tr class="border-t border-slate-800">
+                    <td class="p-2 flex items-center gap-3">
+                      <button class="text-left student-row flex items-center gap-3" data-name="{{ r.name }}">
+                        {% if thumbnails_map.get(r.name) %}
+                          <img src="{{ url_for('download_image', name=thumbnails_map.get(r.name).split('faces/')[1]) }}" class="h-8 w-8 rounded-md object-cover" alt="thumb"/>
+                        {% else %}
+                          <div class="h-8 w-8 rounded-md bg-slate-800 flex items-center justify-center text-xs text-slate-400">—</div>
+                        {% endif %}
+                        <span>{{ r.name }}</span>
+                      </button>
+                    </td>
+                    {% for d, wd in week_dates %}
+                      <td class="p-2 text-center">{{ r.per_date[d] }}</td>
+                    {% endfor %}
+                    <td class="p-2 text-center">{{ r.presents }}</td>
+                    <td class="p-2 text-center">{{ r.total_sessions }}</td>
+                    <td class="p-2 text-center">{{ "%.2f"|format(r.percent) }}%</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-xs text-slate-500">No sessions recorded in the last 7 days.</div>
+        {% endif %}
+      </div>
+
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-3">
+            <p class="text-xs text-slate-400">Students</p>
+            <p class="mt-1 font-semibold">{{ week_summary|length }}</p>
+          </div>
+          <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-3">
+            <p class="text-xs text-slate-400">Weekly defaulters</p>
+            <p class="mt-1 font-semibold">{{ week_defaulters|length }}</p>
+          </div>
+          <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-3">
+            <p class="text-xs text-slate-400">Inconsistent (partial)</p>
+            <p class="mt-1 font-semibold">{{ week_inconsistent|length }}</p>
+          </div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <h4 class="text-sm font-semibold mb-2">Weekly defaulters (&lt; 75%)</h4>
+          {% if week_defaulters %}
+            <ul class="list-disc list-inside text-sm text-slate-300">
+              {% for d in week_defaulters %}
+                <li>{{ d.name }} — {{ "%.2f"|format(d.percent) }}% ({{ d.presents }}/{{ d.total }})</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="text-xs text-slate-500">No weekly defaulters 🎉</div>
+          {% endif %}
+        </div>
+
+        <div>
+          <h4 class="text-sm font-semibold mb-2">Inconsistent / Possible bunkers</h4>
+          {% if week_inconsistent %}
+            <ul class="list-disc list-inside text-sm text-slate-300">
+              {% for d in week_inconsistent %}
+                <li>{{ d.name }} — Present {{ d.presents }} / {{ d.total }} ({{ "%.2f"|format(d.percent) }}%)</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="text-xs text-slate-500">No inconsistencies detected 🎉</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="space-y-4">
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+      <h3 class="text-sm font-semibold mb-3">Latest annotated image</h3>
+      {% if annotated %}
+        <div class="rounded-md border border-slate-800 overflow-hidden">
+          <img id="annotatedHero" src="{{ url_for('download_image', name=annotated) }}" class="w-full rounded-md object-cover" />
+        </div>
+      {% else %}
+        <div class="text-xs text-slate-500">No annotated image yet.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+  // student-row click -> quick modal (native)
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('.student-row');
+    if(!btn) return;
+    const name = btn.dataset.name;
+    // open a small window with CSV filtered by student (quick)
+    window.open(`/attendance?subject={{ selected_subject }}&teacher={{ selected_teacher }}#${encodeURIComponent(name)}`, '_blank');
+  });
+</script>
+{% endblock %}

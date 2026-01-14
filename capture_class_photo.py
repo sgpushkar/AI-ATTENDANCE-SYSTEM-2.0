@@ -1,19 +1,35 @@
-import cv2
-import os
-from datetime import datetime
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const captureClassBtn = document.getElementById("captureClassBtn");
 
-def capture_photo(subject_id):
-    cam = cv2.VideoCapture(0)
+// Start webcam
+navigator.mediaDevices.getUserMedia({ video: true })
+  .then(stream => video.srcObject = stream)
+  .catch(err => alert("Camera access denied"));
 
-    ret, frame = cam.read()
-    cam.release()
+// ✅ Capture class photo
+captureClassBtn.addEventListener("click", async (e) => {
+  e.preventDefault(); // 🔴 VERY IMPORTANT
 
-    if not ret:
-        raise Exception("Camera failed")
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0);
 
-    os.makedirs("uploads", exist_ok=True)
+  const imageData = canvas.toDataURL("image/jpeg");
 
-    filename = f"uploads/class_{subject_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
-    cv2.imwrite(filename, frame)
+  const res = await fetch("/capture_class", {
+    method: "POST",
+    body: new URLSearchParams({
+      imageData: imageData
+    })
+  });
 
-    return filename
+  const data = await res.json();
+
+  if (data.success) {
+    alert("✅ Class photo saved");
+  } else {
+    alert("❌ Failed to save class photo");
+  }
+});
