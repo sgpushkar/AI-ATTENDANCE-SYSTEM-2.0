@@ -3,25 +3,249 @@
 {% block title %}Students • AI Attendance{% endblock %}
 
 {% block content %}
-<h2 class="mb-3 text-lg font-semibold">Manage Students</h2>
-
-<div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 mb-4">
-  <form method="post" enctype="multipart/form-data" class="grid gap-3 md:grid-cols-3">
-    <input name="student_name" class="rounded-lg bg-slate-950 border border-slate-800 p-2 col-span-2" placeholder="Student name (e.g. Alice_Sharma)">
-    <input name="images" type="file" multiple class="rounded-lg bg-slate-950 border border-slate-800 p-2">
-    <button class="col-span-3 md:col-span-1 rounded-xl bg-indigo-500 px-4 py-2">Save student</button>
-  </form>
-</div>
-
-<div class="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
-  {% for s in students %}
-    <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-3 text-center">
-      <div class="text-sm font-semibold mb-1">{{ s.name }}</div>
-      <div class="text-xs text-slate-400 mb-3">{{ s.count }} images</div>
-      <form action="{{ url_for('delete_student', name=s.name) }}" method="post">
-        <button class="text-xs text-red-400">Delete</button>
-      </form>
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-1 h-8 rounded-full bg-gradient-to-b from-gray-300 to-gray-600"></div>
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight">Student Management</h1>
+                <p class="text-sm text-gray-500 mt-1">Register new students and manage existing records</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-xs font-medium px-3 py-1.5 rounded-lg bg-gray-800/50 border border-gray-700/50">
+                {{ students|length }} Registered
+            </span>
+        </div>
     </div>
-  {% endfor %}
+
+    <!-- Add Student Card -->
+    <div class="rounded-xl border border-gray-800 bg-gradient-to-br from-gray-900/40 to-gray-900/20 p-6 backdrop-blur-sm shadow-xl">
+        <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                </svg>
+            </div>
+            <div>
+                <h2 class="text-lg font-semibold text-gray-200">Register New Student</h2>
+                <p class="text-xs text-gray-500 mt-1">Upload multiple face images for better recognition accuracy</p>
+            </div>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="space-y-5">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <!-- Name Input -->
+                <div class="lg:col-span-2">
+                    <label class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 block">Student Name</label>
+                    <div class="relative">
+                        <input name="student_name" 
+                               class="w-full px-4 py-3 rounded-lg bg-gray-900/60 border border-gray-700 focus:border-gray-500 focus:ring-1 focus:ring-gray-500 outline-none transition-all text-sm placeholder:text-gray-600"
+                               placeholder="Enter full name (e.g. Alice Sharma)" required>
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- File Upload -->
+                <div>
+                    <label class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 block">Face Images</label>
+                    <div class="relative">
+                        <input name="images" type="file" multiple 
+                               class="w-full px-4 py-3 rounded-lg bg-gray-900/60 border border-gray-700 focus:border-gray-500 focus:ring-1 focus:ring-gray-500 outline-none transition-all text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gray-800 file:text-gray-300 hover:file:bg-gray-700">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 block">Student ID</label>
+                    <input name="student_id" 
+                           class="w-full px-4 py-3 rounded-lg bg-gray-900/60 border border-gray-700 focus:border-gray-500 focus:ring-1 focus:ring-gray-500 outline-none transition-all text-sm placeholder:text-gray-600"
+                           placeholder="Optional ID or Roll Number">
+                </div>
+                
+                
+                
+            </div>
+
+            <!-- Guidelines -->
+            <div class="rounded-lg bg-gray-900/40 border border-gray-800/50 p-4">
+                <div class="flex items-center gap-2 mb-2">
+                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="text-xs font-medium text-gray-400">Upload Guidelines</span>
+                </div>
+                <ul class="text-xs text-gray-500 space-y-1 list-disc list-inside">
+                    <li>Upload 3-5 clear face images with different angles</li>
+                    <li>Images should be well-lit with face clearly visible</li>
+                    <li>Supported formats: JPG, PNG, WebP</li>
+                    <li>Maximum file size: 5MB per image</li>
+                </ul>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex items-center justify-between pt-4 border-t border-gray-800/50">
+                <div class="text-xs text-gray-500">
+                    <span class="font-medium">{{ students|length }}</span> students currently registered
+                </div>
+                <button type="submit" 
+                        class="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-sm font-semibold transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-gray-900/30">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    Register Student
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Student Grid -->
+    {% if students %}
+    <div class="rounded-xl border border-gray-800 bg-gradient-to-br from-gray-900/40 to-gray-900/20 p-6 backdrop-blur-sm">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5 0a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-200">Registered Students</h2>
+                    <p class="text-xs text-gray-500 mt-1">Click on any student card to view details</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <input type="text" 
+                           placeholder="Search students..." 
+                           class="px-4 py-2 rounded-lg bg-gray-900/60 border border-gray-700 text-sm w-64 focus:outline-none focus:border-gray-500 placeholder:text-gray-600">
+                    <svg class="w-4 h-4 text-gray-600 absolute right-3 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {% for s in students %}
+            <div class="group rounded-xl border border-gray-800 bg-gray-900/40 hover:bg-gray-800/30 p-4 transition-all hover:scale-[1.02] hover:border-gray-700 cursor-pointer">
+                <!-- Student Header -->
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center text-sm font-bold text-gray-300">
+                            {{ s.name[0]|upper }}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-semibold text-gray-200 truncate">{{ s.name }}</h3>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-xs px-2 py-0.5 rounded-full bg-gray-800/50 text-gray-400">{{ s.count }} images</span>
+                                {% if s.class %}
+                                <span class="text-xs px-2 py-0.5 rounded-full bg-gray-800/30 text-gray-500">{{ s.class }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Student Stats -->
+                <div class="grid grid-cols-3 gap-2 mb-4">
+                    <div class="text-center p-2 rounded-lg bg-gray-900/50">
+                        <div class="text-xs text-gray-500">Attendance</div>
+                        <div class="text-sm font-bold text-gray-300">{{ s.attendance or 0 }}%</div>
+                    </div>
+                    <div class="text-center p-2 rounded-lg bg-gray-900/50">
+                        <div class="text-xs text-gray-500">Last Seen</div>
+                        <div class="text-sm font-bold text-gray-300">{{ s.last_seen or 'Never' }}</div>
+                    </div>
+                    <div class="text-center p-2 rounded-lg bg-gray-900/50">
+                        <div class="text-xs text-gray-500">Streak</div>
+                        <div class="text-sm font-bold text-gray-300">{{ s.streak or 0 }} 🔥</div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-between pt-3 border-t border-gray-800/50">
+                    <div class="flex gap-2">
+                        <button class="text-xs px-3 py-1 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 text-gray-400 transition-colors">
+                            View
+                        </button>
+                        <button class="text-xs px-3 py-1 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 text-gray-400 transition-colors">
+                            Edit
+                        </button>
+                    </div>
+                    <form action="{{ url_for('delete_student', name=s.name) }}" method="post" 
+                          class="inline" onsubmit="return confirm('Delete {{ s.name }}?');">
+                        <button type="submit" 
+                                class="text-xs px-3 py-1 rounded-lg bg-gray-900/50 hover:bg-red-900/30 text-gray-500 hover:text-red-400 transition-all">
+                            Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="rounded-xl border border-gray-800 bg-gradient-to-br from-gray-900/40 to-gray-900/20 p-12 text-center">
+        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5 0a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/>
+            </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-300 mb-2">No Students Registered</h3>
+        <p class="text-sm text-gray-500 mb-6">Add your first student to start using the attendance system</p>
+        <button onclick="document.querySelector('form').scrollIntoView({ behavior: 'smooth' })" 
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-sm font-medium transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+            Add First Student
+        </button>
+    </div>
+    {% endif %}
+
+    <!-- Statistics Footer -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="rounded-xl border border-gray-800 bg-gray-900/40 p-4">
+            <div class="text-xs text-gray-500 mb-1">Total Images</div>
+            <div class="text-2xl font-bold text-gray-300">
+                {% set total_images = students|sum(attribute='count') %}
+                {{ total_images }}
+            </div>
+        </div>
+        <div class="rounded-xl border border-gray-800 bg-gray-900/40 p-4">
+            <div class="text-xs text-gray-500 mb-1">Average per Student</div>
+            <div class="text-2xl font-bold text-gray-300">
+                {% if students %}
+                    {{ (total_images / students|length)|round(1) }}
+                {% else %}
+                    0
+                {% endif %}
+            </div>
+        </div>
+        <div class="rounded-xl border border-gray-800 bg-gray-900/40 p-4">
+            <div class="text-xs text-gray-500 mb-1">Encoding Status</div>
+            <div class="text-2xl font-bold text-gray-300">
+                {% if total_images > 0 %}
+                    Ready
+                {% else %}
+                    Pending
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
