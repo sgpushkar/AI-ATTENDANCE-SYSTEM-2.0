@@ -3,170 +3,488 @@
 {% block title %}Dashboard • AI Attendance{% endblock %}
 
 {% block content %}
-<section class="grid gap-6 md:grid-cols-3">
-    <div class="md:col-span-2 space-y-4">
-        <div class="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 to-slate-950 p-6 flex flex-col gap-4">
-            <div class="flex items-center justify-between gap-4">
-                <div>
-                    <h1 class="text-2xl font-semibold tracking-tight">Welcome back</h1>
-                    <p class="text-sm text-slate-400 mt-1">Use your webcam to recognize students and mark attendance in real time.</p>
+<section class="grid gap-6 lg:grid-cols-3">
+    <!-- Left Column -->
+    <div class="lg:col-span-2 space-y-6">
+        <!-- Welcome Card -->
+        <div class="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 p-6 shadow-lg">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                        <h1 class="text-2xl font-bold tracking-tight bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">Welcome back</h1>
+                    </div>
+                    <p class="text-sm text-slate-400">Real-time face recognition for attendance management</p>
                 </div>
-                <div class="hidden sm:flex gap-3">
-                    <a href="{{ url_for('capture_page') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm">Capture faces</a>
-                    <a href="{{ url_for('attendance') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-sm font-medium">Start attendance</a>
+                <div class="flex gap-3">
+                    <a href="{{ url_for('capture_page') }}" 
+                       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/90 text-sm font-medium transition-all hover:scale-[1.02] active:scale-95 border border-slate-700/50">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        Capture Faces
+                    </a>
+                    <a href="{{ url_for('attendance') }}" 
+                       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-sm font-semibold transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-indigo-500/20">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                        Start Attendance
+                    </a>
                 </div>
             </div>
 
-            <div class="grid gap-4 sm:grid-cols-3 mt-4">
-                <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-                    <p class="text-xs text-slate-400">Total students</p>
-                    <p class="mt-2 text-2xl font-semibold">{{ student_count }}</p>
+            <!-- Stats Grid -->
+            <div class="grid gap-4 sm:grid-cols-3">
+                <div class="group rounded-xl border border-slate-800 bg-slate-900/40 p-4 hover:border-indigo-500/50 transition-all cursor-pointer hover:scale-[1.02]">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs text-slate-400 font-medium">Total Students</p>
+                        <svg class="w-4 h-4 text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </div>
+                    <p class="mt-3 text-3xl font-bold">{{ student_count }}</p>
+                    <div class="mt-2 text-xs text-slate-500">Active in system</div>
                 </div>
-                <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-                    <p class="text-xs text-slate-400">Total attendance rows</p>
-                    <p class="mt-2 text-2xl font-semibold">{{ attendance_count }}</p>
+                
+                <div class="group rounded-xl border border-slate-800 bg-slate-900/40 p-4 hover:border-emerald-500/50 transition-all cursor-pointer hover:scale-[1.02]">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs text-slate-400 font-medium">Attendance Records</p>
+                        <svg class="w-4 h-4 text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </div>
+                    <p class="mt-3 text-3xl font-bold">{{ attendance_count }}</p>
+                    <div class="mt-2 text-xs text-slate-500">Total entries</div>
                 </div>
-                <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-                    <p class="text-xs text-slate-400">Class photos</p>
-                    <p class="mt-2 text-2xl font-semibold">{{ uploads_count }}</p>
+                
+                <div class="group rounded-xl border border-slate-800 bg-slate-900/40 p-4 hover:border-amber-500/50 transition-all cursor-pointer hover:scale-[1.02]">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs text-slate-400 font-medium">Class Photos</p>
+                        <svg class="w-4 h-4 text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </div>
+                    <p class="mt-3 text-3xl font-bold">{{ uploads_count }}</p>
+                    <div class="mt-2 text-xs text-slate-500">Uploaded images</div>
                 </div>
             </div>
         </div>
 
-        <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-            <h2 class="text-sm font-semibold mb-3 text-slate-200">Quick actions</h2>
-            <div class="grid gap-3 sm:grid-cols-3 text-sm">
-                <a href="{{ url_for('capture_page') }}" class="rounded-xl border border-slate-800 bg-slate-900 hover:border-indigo-500 px-4 py-3 flex flex-col gap-1">
-                    <span class="font-medium">Register new student</span>
+        <!-- Quick Actions & Class Photo Capture -->
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-lg font-semibold text-slate-200">Quick Actions</h2>
+                <span class="text-xs text-slate-500 bg-slate-800/50 px-2 py-1 rounded-lg">Click to navigate</span>
+            </div>
+            
+            <div class="grid gap-4 sm:grid-cols-3 mb-8">
+                <a href="{{ url_for('capture_page') }}" 
+                   class="group rounded-xl border border-slate-800 bg-slate-900/50 hover:border-indigo-500/50 hover:bg-slate-800/30 p-4 flex flex-col gap-2 transition-all hover:scale-[1.02]">
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                            </svg>
+                        </div>
+                        <svg class="w-4 h-4 text-slate-600 group-hover:text-indigo-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                        </svg>
+                    </div>
+                    <span class="font-medium text-sm">Register Student</span>
                     <span class="text-xs text-slate-400">Capture face and save encoding</span>
                 </a>
-                <a href="{{ url_for('attendance') }}" class="rounded-xl border border-slate-800 bg-slate-900 hover:border-indigo-500 px-4 py-3 flex flex-col gap-1">
-                    <span class="font-medium">Take attendance</span>
+                
+                <a href="{{ url_for('attendance') }}" 
+                   class="group rounded-xl border border-slate-800 bg-slate-900/50 hover:border-emerald-500/50 hover:bg-slate-800/30 p-4 flex flex-col gap-2 transition-all hover:scale-[1.02]">
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <svg class="w-4 h-4 text-slate-600 group-hover:text-emerald-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                        </svg>
+                    </div>
+                    <span class="font-medium text-sm">Take Attendance</span>
                     <span class="text-xs text-slate-400">Start webcam & recognize faces</span>
                 </a>
-                <a href="{{ url_for('students') }}" class="rounded-xl border border-slate-800 bg-slate-900 hover:border-indigo-500 px-4 py-3 flex flex-col gap-1">
-                    <span class="font-medium">Manage students</span>
+                
+                <a href="{{ url_for('students') }}" 
+                   class="group rounded-xl border border-slate-800 bg-slate-900/50 hover:border-amber-500/50 hover:bg-slate-800/30 p-4 flex flex-col gap-2 transition-all hover:scale-[1.02]">
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5 0a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/>
+                            </svg>
+                        </div>
+                        <svg class="w-4 h-4 text-slate-600 group-hover:text-amber-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                        </svg>
+                    </div>
+                    <span class="font-medium text-sm">Manage Students</span>
                     <span class="text-xs text-slate-400">View, edit or delete records</span>
                 </a>
             </div>
 
-            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 mt-4">
-              <div class="flex items-center justify-between mb-3">
-                <div>
-                  <h3 class="text-sm font-semibold">Quick class photo</h3>
-                  <p class="text-xs text-slate-400">Capture a class photo here and automatically mark attendance.</p>
+            <!-- Class Photo Capture Card -->
+            <div class="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900/80 to-slate-950/80 p-5">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                            <h3 class="text-sm font-semibold">Quick Class Photo</h3>
+                        </div>
+                        <p class="text-xs text-slate-400">Capture a class photo here and automatically mark attendance</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input id="autoRecMain" type="checkbox" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                            <span class="ml-3 text-xs text-slate-300">Auto Recognize</span>
+                        </label>
+                    </div>
                 </div>
-                <div>
-                  <label class="inline-flex items-center text-xs text-slate-300">
-                    <input id="autoRecMain" type="checkbox" class="mr-2" checked>
-                    Auto recognize
-                  </label>
-                </div>
-              </div>
 
-              <div class="grid md:grid-cols-2 gap-3 items-center">
-                <div class="aspect-video rounded-md overflow-hidden bg-black border border-slate-800">
-                  <video id="dashboardVideo" autoplay playsinline class="w-full h-full object-cover"></video>
-                  <canvas id="dashboardCanvas" class="hidden"></canvas>
-                </div>
+                <div class="grid md:grid-cols-2 gap-6 items-center">
+                    <div class="relative aspect-video rounded-xl overflow-hidden bg-black border-2 border-slate-800 group">
+                        <video id="dashboardVideo" autoplay playsinline class="w-full h-full object-cover"></video>
+                        <canvas id="dashboardCanvas" class="hidden"></canvas>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div class="absolute bottom-3 left-3 text-xs text-slate-400 bg-black/50 px-2 py-1 rounded">
+                            <span id="cameraStatus" class="flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                                Camera Off
+                            </span>
+                        </div>
+                    </div>
 
-                <div class="flex flex-col gap-3">
-                  <div class="flex gap-2 items-center">
-                    <select id="subjectSelect" class="bg-slate-950 border border-slate-800 rounded-xl p-2 text-sm">
-                      {% for s in subjects %}
-                        <option value="{{ s }}">{{ s }}</option>
-                      {% endfor %}
-                    </select>
-                    <select id="teacherSelect" class="bg-slate-950 border border-slate-800 rounded-xl p-2 text-sm">
-                      <option value="">Teacher (optional)</option>
-                      {% for t in teachers %}
-                        <option value="{{ t }}">{{ t }}</option>
-                      {% endfor %}
-                    </select>
-                  </div>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-xs text-slate-400 block mb-1">Subject</label>
+                                <select id="subjectSelect" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
+                                    {% for s in subjects %}
+                                        <option value="{{ s }}">{{ s }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400 block mb-1">Teacher (Optional)</label>
+                                <select id="teacherSelect" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
+                                    <option value="">Select Teacher</option>
+                                    {% for t in teachers %}
+                                        <option value="{{ t }}">{{ t }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
 
-                  <p class="text-xs text-slate-400">Use this to quickly capture the whole class from the dashboard. Allow camera access when asked.</p>
-                  <div class="flex gap-2">
-                    <button id="startDashboardCam" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm">Start Camera</button>
-                    <button id="captureClassMain" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-sm font-medium">Capture Class Photo</button>
-                  </div>
-                  <div id="classCaptureStatus" class="text-xs text-slate-400"></div>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Capture the entire class in one photo. The system will automatically detect and mark attendance for recognized faces.
+                        </p>
+
+                        <div class="flex gap-3">
+                            <button id="startDashboardCam" 
+                                    class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-sm font-medium transition-all hover:scale-[1.02] active:scale-95">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                                Start Camera
+                            </button>
+                            <button id="captureClassMain" 
+                                    class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-sm font-semibold transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                Capture Photo
+                            </button>
+                        </div>
+                        
+                        <div id="classCaptureStatus" class="text-xs text-slate-400 min-h-[20px] transition-all"></div>
+                    </div>
                 </div>
-              </div>
             </div>
         </div>
 
-        <!-- Timeline widget -->
-        <div id="timelineWidget" class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
-          <h3 class="text-sm font-semibold mb-2 text-slate-200">Timeline</h3>
-          <div id="timelineList" class="space-y-2 text-xs text-slate-300">Loading…</div>
+        <!-- Timeline Widget -->
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-slate-200">Recent Activity Timeline</h3>
+                <span id="timelineRefresh" class="text-xs text-slate-500 hover:text-slate-300 cursor-pointer transition-colors">
+                    <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    Refresh
+                </span>
+            </div>
+            <div id="timelineList" class="space-y-3">
+                <!-- Loading skeleton -->
+                {% for _ in range(4) %}
+                <div class="animate-pulse">
+                    <div class="flex gap-3 items-center">
+                        <div class="w-16 h-10 bg-slate-800 rounded"></div>
+                        <div class="flex-1">
+                            <div class="h-4 bg-slate-800 rounded mb-1"></div>
+                            <div class="h-3 bg-slate-800/50 rounded w-2/3"></div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 
-    <div class="space-y-4">
-        <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-            <h2 class="text-sm font-semibold mb-3 text-slate-200">Latest class photo</h2>
+    <!-- Right Column -->
+    <div class="space-y-6">
+        <!-- Latest Class Photo Card -->
+        <div class="rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950 p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-sm font-semibold text-slate-200">Latest Class Photo</h2>
+                {% if latest %}
+                <span class="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-lg">Recent</span>
+                {% endif %}
+            </div>
+            
             {% if latest %}
-                <div class="aspect-video rounded-xl border border-slate-800 overflow-hidden bg-black mb-3">
-                    <img src="{{ url_for('download_image', name=latest) }}" alt="Latest photo" class="w-full h-full object-cover">
+                <div class="relative aspect-video rounded-xl border-2 border-slate-800 overflow-hidden bg-black mb-4 group">
+                    <img src="{{ url_for('download_image', name=latest) }}" 
+                         alt="Latest class photo" 
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <a href="{{ url_for('download_image', name=latest) }}" 
+                           target="_blank"
+                           class="absolute bottom-3 right-3 bg-black/50 hover:bg-black/70 text-white p-2 rounded-lg transition-all">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                        </a>
+                    </div>
                 </div>
+                <p class="text-xs text-slate-400 mb-1 truncate">{{ latest }}</p>
             {% else %}
-                <p class="text-xs text-slate-500">No class photo uploaded yet. Capture one from the dashboard or Capture Faces page.</p>
+                <div class="aspect-video rounded-xl border-2 border-dashed border-slate-800 bg-slate-900/50 flex flex-col items-center justify-center mb-4">
+                    <svg class="w-12 h-12 text-slate-700 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <p class="text-sm text-slate-500">No photo captured</p>
+                    <p class="text-xs text-slate-600 mt-1">Capture one from above</p>
+                </div>
             {% endif %}
 
-            <form method="POST" action="{{ url_for('encode') }}" class="mt-3 flex flex-col gap-2">
-                <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-sm font-medium">
-                    Run face encoding
+            <form method="POST" action="{{ url_for('encode') }}" class="space-y-3">
+                <button type="submit" 
+                        class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-sm font-semibold transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                    </svg>
+                    Run Face Encoding
                 </button>
-                <p class="text-[11px] text-slate-400">Encodings {{ 'available' if enc_exists else 'not generated yet' }}.</p>
+                <div class="flex items-center justify-between text-xs">
+                    <span class="text-slate-400">Encoding status:</span>
+                    <span class="{{ 'text-emerald-400' if enc_exists else 'text-amber-400' }} font-medium">
+                        {{ 'Available' if enc_exists else 'Not Generated' }}
+                    </span>
+                </div>
             </form>
         </div>
 
-        <!-- Top streaks widget -->
-        <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
-          <h3 class="text-sm font-semibold mb-2 text-slate-200">Top streaks</h3>
-          <ul class="text-sm text-slate-300">
+        <!-- Top Streaks Widget -->
+        <div class="rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950 p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-slate-200">Attendance Streaks</h3>
+                <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                </svg>
+            </div>
+            
             {% if top_streaks %}
-              {% for t in top_streaks %}
-                <li class="mb-1">{{ loop.index }}. {{ t.name }} — {{ t.streak }} day{{ 's' if t.streak != 1 else '' }}</li>
-              {% endfor %}
+                <div class="space-y-3">
+                    {% for t in top_streaks[:5] %}
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-slate-800/30 hover:bg-slate-800/50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="relative">
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-xs font-bold">
+                                    {{ loop.index }}
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium">{{ t.name[:20] }}{{ '...' if t.name|length > 20 else '' }}</p>
+                                <p class="text-xs text-slate-400">{{ t.streak }} day{{ 's' if t.streak != 1 else '' }}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-slate-400">Current streak</div>
+                            <div class="text-sm font-semibold text-amber-300">{{ t.streak }}🔥</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
             {% else %}
-              <li class="text-xs text-slate-400">No streaks yet.</li>
+                <div class="text-center py-6">
+                    <svg class="w-12 h-12 text-slate-700 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <p class="text-sm text-slate-400">No streaks recorded yet</p>
+                    <p class="text-xs text-slate-600 mt-1">Take attendance to see streaks</p>
+                </div>
             {% endif %}
-          </ul>
+        </div>
+
+        <!-- System Status -->
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+            <h3 class="text-sm font-semibold text-slate-200 mb-4">System Status</h3>
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-slate-400">Face Recognition</span>
+                    <span class="inline-flex items-center gap-1 text-xs {{ 'text-emerald-400' if enc_exists else 'text-amber-400' }}">
+                        <span class="w-2 h-2 rounded-full {{ 'bg-emerald-500' if enc_exists else 'bg-amber-500' }} animate-pulse"></span>
+                        {{ 'Ready' if enc_exists else 'Training Needed' }}
+                    </span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-slate-400">Database</span>
+                    <span class="inline-flex items-center gap-1 text-xs text-emerald-400">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        Connected
+                    </span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-slate-400">Camera Access</span>
+                    <span id="systemCamStatus" class="inline-flex items-center gap-1 text-xs text-slate-400">
+                        <span class="w-2 h-2 rounded-full bg-slate-500"></span>
+                        Unknown
+                    </span>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 
+<!-- Enhanced JavaScript -->
 <script>
-async function fetchTimeline(){
-  try{
-    const r = await fetch('/timeline');
-    const j = await r.json();
-    const el = document.getElementById('timelineList');
-    el.innerHTML = '';
-    if(!j.success || !j.timeline || j.timeline.length===0){
-      el.innerHTML = '<div class="text-xs text-slate-400">No logs yet.</div>';
-      return;
+// Update camera status indicator
+function updateCameraStatus(isActive) {
+    const statusEl = document.getElementById('cameraStatus');
+    const systemStatusEl = document.getElementById('systemCamStatus');
+    const statusText = isActive ? 'Camera Active' : 'Camera Off';
+    const statusColor = isActive ? 'bg-emerald-500' : 'bg-red-500';
+    const systemText = isActive ? 'Available' : 'Not Available';
+    const systemColor = isActive ? 'text-emerald-400' : 'text-slate-400';
+    
+    if (statusEl) {
+        statusEl.innerHTML = `
+            <span class="flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full ${statusColor} animate-pulse"></span>
+                ${statusText}
+            </span>
+        `;
     }
-    j.timeline.slice(0,8).forEach(item=>{
-      const div = document.createElement('div');
-      div.className = 'flex gap-3 items-center';
-      const imgHtml = item.photo ? `<img src="{{ url_for('download_image', name='') }}${item.photo}" class="w-14 h-9 object-cover rounded">` : '<div class="w-14 h-9 bg-slate-800 rounded"></div>';
-      // If the above url_for trick doesn't resolve correctly for all setups, JS will still show a blank image; server-side paths are under uploads/
-      div.innerHTML = `<div style="min-width:72px">${imgHtml}</div>
-        <div class="flex-1">
-          <div class="font-medium text-[13px]">${item.subject}${item.teacher?(' • '+item.teacher):''}</div>
-          <div class="text-[11px] text-slate-400">${item.ts} — ${item.marked} marked / ${item.faces_found} faces</div>
-        </div>`;
-      el.appendChild(div);
-    });
-  }catch(e){
-    // silent
-  }
+    
+    if (systemStatusEl) {
+        systemStatusEl.innerHTML = `
+            <span class="inline-flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full ${isActive ? 'bg-emerald-500' : 'bg-slate-500'}"></span>
+                ${systemText}
+            </span>
+        `;
+    }
 }
-fetchTimeline();
-setInterval(fetchTimeline, 10000);
+
+// Enhanced timeline fetching with loading states
+let timelineLoading = false;
+async function fetchTimeline(showLoading = false) {
+    if (timelineLoading) return;
+    timelineLoading = true;
+    
+    const el = document.getElementById('timelineList');
+    if (showLoading && el) {
+        el.innerHTML = `
+            <div class="flex justify-center py-4">
+                <div class="animate-spin rounded-full h-6 w-6 border-2 border-indigo-500 border-t-transparent"></div>
+            </div>
+        `;
+    }
+    
+    try {
+        const r = await fetch('/timeline');
+        const j = await r.json();
+        
+        if (!el) return;
+        
+        if (!j.success || !j.timeline || j.timeline.length === 0) {
+            el.innerHTML = `
+                <div class="text-center py-6">
+                    <svg class="w-8 h-8 text-slate-700 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <p class="text-sm text-slate-400">No activity yet</p>
+                    <p class="text-xs text-slate-600 mt-1">Capture photos to see timeline</p>
+                </div>
+            `;
+            return;
+        }
+        
+        el.innerHTML = '';
+        j.timeline.slice(0, 6).forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'group flex gap-3 items-center p-2 rounded-lg hover:bg-slate-800/30 transition-colors';
+            
+            const imgHtml = item.photo ? 
+                `<img src="{{ url_for('download_image', name='') }}${item.photo}" class="w-16 h-10 object-cover rounded-lg border border-slate-800 group-hover:border-indigo-500/50 transition-colors">` : 
+                '<div class="w-16 h-10 bg-slate-800 rounded-lg flex items-center justify-center"><svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>';
+            
+            div.innerHTML = `
+                ${imgHtml}
+                <div class="flex-1 min-w-0">
+                    <div class="font-medium text-[13px] truncate">${item.subject || 'No Subject'}${item.teacher ? (' • ' + item.teacher) : ''}</div>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="text-[11px] text-slate-400">${item.ts || 'Just now'}</span>
+                        <span class="text-[11px] px-1.5 py-0.5 rounded ${item.marked > 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-800 text-slate-500'}">
+                            ${item.marked || 0} marked
+                        </span>
+                    </div>
+                </div>
+            `;
+            el.appendChild(div);
+        });
+    } catch (e) {
+        console.error('Timeline fetch error:', e);
+        if (el) {
+            el.innerHTML = '<div class="text-center py-4 text-xs text-amber-400">Failed to load timeline</div>';
+        }
+    } finally {
+        timelineLoading = false;
+    }
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    // Fetch initial timeline
+    fetchTimeline(true);
+    
+    // Refresh button
+    const refreshBtn = document.getElementById('timelineRefresh');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => fetchTimeline(true));
+    }
+    
+    // Auto-refresh every 30 seconds
+    setInterval(() => fetchTimeline(), 30000);
+    
+    // Initialize camera status
+    updateCameraStatus(false);
+});
+
+// Export functions for classphoto.js
+window.dashboardUtils = {
+    updateCameraStatus,
+    fetchTimeline
+};
 </script>
 
 <script src="{{ url_for('static', filename='classphoto.js') }}"></script>
